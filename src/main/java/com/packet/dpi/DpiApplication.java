@@ -33,15 +33,25 @@ public class DpiApplication implements CommandLineRunner {
         }).start();
     }
 
-    private void startLiveSniffing() throws PcapNativeException, NotOpenException {
+    private void startLiveSniffing() throws PcapNativeException, NotOpenException, InterruptedException {
         List<PcapNetworkInterface> allDevs = Pcaps.findAllDevs();
         if (allDevs.isEmpty()) {
             System.out.println("No network interfaces found.");
             return;
         }
 
-        PcapNetworkInterface nif = allDevs.get(0);
-        System.out.println("Sniffing live on network card: " + nif.getName());
+        // This will print out all your network cards!
+        System.out.println("\n--- AVAILABLE NETWORK CARDS ---");
+        for (int i = 0; i < allDevs.size(); i++) {
+            System.out.println("Index " + i + ": " + allDevs.get(i).getDescription());
+        }
+        System.out.println("-------------------------------\n");
+
+        // 👇 THIS IS THE ONLY NUMBER YOU WILL NEED TO CHANGE 👇
+        int activeNetworkCardIndex = 4;
+
+        PcapNetworkInterface nif = allDevs.get(activeNetworkCardIndex);
+        System.out.println("Sniffing live on network card: " + nif.getDescription());
 
         int snapLen = 65536;
         PcapNetworkInterface.PromiscuousMode mode = PcapNetworkInterface.PromiscuousMode.PROMISCUOUS;
