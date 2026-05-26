@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DPI Live Traffic Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e2e; color: #cdd6f4; text-align: center; padding: 50px; }
+        .card { background-color: #313244; padding: 25px; border-radius: 12px; display: inline-block; margin: 15px; width: 320px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #89b4fa; margin-bottom: 40px; }
+        .number { font-size: 2.5em; font-weight: bold; color: #a6e3a1; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<h1>Deep Packet Inspection Engine</h1>
+
+<div class="card">
+    <h3>Total Packets Sniffed</h3>
+    <div class="number" id="packetCount">0</div>
+</div>
+
+<div class="card">
+    <h3>Top Classified Stream</h3>
+    <div class="number" id="topDomain" style="color: #f38ba8;">Listening...</div>
+</div>
+
+<script>
+    setInterval(async () => {
+        try {
+            const response = await fetch('/api/stats');
+            const data = await response.json();
+
+            document.getElementById('packetCount').innerText = data.totalPackets;
+
+            const domains = data.detectedDomains;
+            if(Object.keys(domains).length > 0) {
+                const top = Object.keys(domains).reduce((a, b) => domains[a] > domains[b] ? a : b);
+                document.getElementById('topDomain').innerText = top;
+            }
+        } catch (error) {
+            console.error("Error updating metrics dashboard", error);
+        }
+    }, 1000);
+</script>
+</body>
+</html>
